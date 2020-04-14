@@ -1,0 +1,25 @@
+.center {
+  text-align: center;
+}
+
+.selected {
+  background: gray;
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex>a {
+  padding: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.m-50 {
+  margin: 50px;
+}

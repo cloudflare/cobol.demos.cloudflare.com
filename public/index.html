@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>COBOL's rock paper scissors</title>
+  <link rel="stylesheet" type="text/css" href="/style.css">
+</head>
+<body>
+  <div class="center">
+    <h1>COBOL's rock paper scissors</h1>
+
+    <h2>You choose: <span id="player-choice"></span></h2>
+
+    <div class="m-50 flex">
+      <a data-value="rock" href="#" onclick="select(this)">
+        <img src="/img/rock.png" alt="rock">
+        <br />
+        Rock
+      </a>
+      <a data-value="paper" href="#" onclick="select(this)">
+        <img src="/img/paper.png" alt="paper">
+        <br />
+        Paper
+      </a>
+      <a data-value="scissors" href="#" onclick="select(this)">
+        <img src="/img/scissors.png" alt="scissors">
+        <br />
+        Scissors
+      </a>
+    </div>
+
+    <div class="m-50">
+      <button type="submit" id="submit">Play</button>
+    </div>
+
+    <div id="res" class="hidden m-50">
+      <h2>COBOL chose: <span id="computer-choice">?</span></h2>
+      <img id="img-res"/>
+      <h2 id="text-res">?</h2>
+    </div>
+  </div>
+
+  <script charset="utf-8">
+    let playerSelectedElement;
+
+    const submit = document.getElementById("submit");
+    const result = document.getElementById("res");
+    const imgResult = document.getElementById("img-res");
+    const textResult = document.getElementById("text-res");
+    const computerChoice = document.getElementById("computer-choice");
+    const playerChoice = document.getElementById("player-choice");
+
+    function clearSelectedElement() {
+      if (playerSelectedElement !== undefined) {
+        playerSelectedElement.classList.toggle("selected");
+      }
+      playerSelectedElement = undefined;
+    }
+
+    function select(element) {
+      clearSelectedElement();
+      element.classList.toggle("selected");
+      result.classList.add("hidden");
+      playerSelectedElement = element;
+      playerChoice.innerText = element.dataset.value;
+    }
+
+    function getRes(l, r, error = false) {
+      if (l === "paper" && r === "rock") {
+        return {
+          img: "paper_covers_rock.png",
+          txt: "Paper covers rock",
+        }
+      }
+      if (l === "rock" && r === "scissors") {
+        return {
+          img: "rock_smashes_scissors.png",
+          txt: "Rock smashes scissors",
+        }
+      }
+      if (l === "scissors" && r === "paper") {
+        return {
+          img: "scissors_cut_paper.png",
+          txt: "Scissors cut paper",
+        }
+      }
+      if (l === r) {
+        return {
+          img: l + ".png",
+          txt: "Try again",
+        }
+      }
+      if (error === true) {
+        throw new Error("unreachable");
+      }
+      return getRes(r, l, true);
+    }
+
+    const resToText = {
+      win: "You win!",
+      lose: "You lose!",
+      tie: "Tie!",
+    };
+
+    submit.addEventListener("click", function (e) {
+      if (playerSelectedElement === undefined) {
+        throw new Error("no input selected");
+      }
+
+      fetch('https://cobol.speedcf.com/api', {
+        method: 'POST',
+        body: "pick=" + playerSelectedElement.dataset.value
+      })
+        .then(res => res.json())
+        .then(res => {
+          result.classList.remove("hidden");
+          clearSelectedElement();
+
+          const {img, txt} = getRes(res.player.trim(), res.computer.trim());
+
+          computerChoice.innerText = res.computer;
+          textResult.innerText = txt + ". " + resToText[res.result.trim()];
+          imgResult.src = "/img/" + img;
+        })
+        .catch(err => {
+          throw err;
+        });
+    });
+  </script>
+</body>
+</html>
