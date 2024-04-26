@@ -106,7 +106,7 @@
         throw new Error("no input selected");
       }
 
-      fetch('https://cobol.speedcf.com/api', {
+      fetch('https://cobol.demos.cloudflare.com/api', {
         method: 'POST',
         body: "pick=" + playerSelectedElement.dataset.value
       })
